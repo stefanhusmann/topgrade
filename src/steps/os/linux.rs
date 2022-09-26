@@ -110,6 +110,7 @@ impl Distribution {
 
     pub fn show_summary(self) {
         if let Distribution::Arch = self {
+	    
             archlinux::show_pacnew();
         }
     }

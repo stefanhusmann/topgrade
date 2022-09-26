@@ -190,37 +190,38 @@ impl ArchPackageManager for Pikaur {
     }
 }
 
-pub struct Pamac {
+pub struct Pakku {
     executable: PathBuf,
 }
 
-impl Pamac {
+impl Pakku {
     fn get() -> Option<Self> {
         Some(Self {
-            executable: which("pamac")?,
+            executable: which("pakku")?,
         })
     }
 }
-impl ArchPackageManager for Pamac {
+
+impl ArchPackageManager for Pakku {
     fn upgrade(&self, ctx: &ExecutionContext) -> Result<()> {
         let mut command = ctx.run_type().execute(&self.executable);
 
         command
-            .arg("upgrade")
-            .args(ctx.config().pamac_arguments().split_whitespace())
+            .arg("-Syu")
+            .args(ctx.config().pakku_arguments().split_whitespace())
             .env("PATH", get_execution_path());
 
         if ctx.config().yes(Step::System) {
-            command.arg("--no-confirm");
+            command.arg("--noconfirm");
         }
 
         command.check_run()?;
 
         if ctx.config().cleanup() {
             let mut command = ctx.run_type().execute(&self.executable);
-            command.arg("clean");
+            command.arg("-Suy");
             if ctx.config().yes(Step::System) {
-                command.arg("--no-confirm");
+                command.arg("--noconfirm");
             }
             command.check_run()?;
         }
@@ -242,14 +243,14 @@ pub fn get_arch_package_manager(ctx: &ExecutionContext) -> Option<Box<dyn ArchPa
             .or_else(|| YayParu::get("yay", &pacman).map(box_package_manager))
             .or_else(|| Trizen::get().map(box_package_manager))
             .or_else(|| Pikaur::get().map(box_package_manager))
-            .or_else(|| Pamac::get().map(box_package_manager))
+            .or_else(|| Pakku::get().map(box_package_manager))
             .or_else(|| Pacman::get(ctx).map(box_package_manager)),
         config::ArchPackageManager::Trizen => Trizen::get().map(box_package_manager),
         config::ArchPackageManager::Paru => YayParu::get("paru", &pacman).map(box_package_manager),
         config::ArchPackageManager::Yay => YayParu::get("yay", &pacman).map(box_package_manager),
         config::ArchPackageManager::Pacman => Pacman::get(ctx).map(box_package_manager),
         config::ArchPackageManager::Pikaur => Pikaur::get().map(box_package_manager),
-        config::ArchPackageManager::Pamac => Pamac::get().map(box_package_manager),
+        config::ArchPackageManager::Pakku => Pakku::get().map(box_package_manager),
     }
 }
 

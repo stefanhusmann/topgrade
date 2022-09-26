@@ -124,7 +124,6 @@ pub enum Step {
     Sheldon,
     Shell,
     Snap,
-    Sparkle,
     Spicetify,
     Stack,
     System,
@@ -202,7 +201,7 @@ pub enum ArchPackageManager {
     Yay,
     Pacman,
     Pikaur,
-    Pamac,
+    Pakku,
 }
 
 #[derive(Deserialize, Default, Debug)]
@@ -213,7 +212,7 @@ pub struct Linux {
     show_arch_news: Option<bool>,
     trizen_arguments: Option<String>,
     pikaur_arguments: Option<String>,
-    pamac_arguments: Option<String>,
+    pakku_arguments: Option<String>,
     dnf_arguments: Option<String>,
     apt_arguments: Option<String>,
     enable_tlmgr: Option<bool>,
@@ -255,6 +254,7 @@ pub struct ConfigFile {
     display_time: Option<bool>,
     assume_yes: Option<bool>,
     yay_arguments: Option<String>,
+    pakku_arguments: Option<String>,
     no_retry: Option<bool>,
     run_in_tmux: Option<bool>,
     cleanup: Option<bool>,
@@ -698,12 +698,13 @@ impl Config {
             .unwrap_or("")
     }
 
-    /// Extra Pamac arguments
-    pub fn pamac_arguments(&self) -> &str {
+    /// Extra Pakku arguments
+    #[allow(dead_code)]
+    pub fn pakku_arguments(&self) -> &str {
         self.config_file
             .linux
             .as_ref()
-            .and_then(|s| s.pamac_arguments.as_deref())
+            .and_then(|s| s.pakku_arguments.as_deref())
             .unwrap_or("")
     }
 
